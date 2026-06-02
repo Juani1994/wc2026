@@ -33,33 +33,96 @@ export function getBestThirdPlaces(matches: Record<string, Match>) {
     .slice(0, 8);
 }
 
-// Assign third-place teams to Round of 32 slots
+// Assign third-place teams to Round of 32 slots using backtracking
 export function assignThirdsToRound32(
   thirdPlaces: any[]
 ): Record<string, string | null> {
-  const assignment: Record<string, string | null> = {};
-
-  // Get all third-place slots (matches with team2Type === "third")
   const thirdSlots = ROUND_32_STRUCTURE.filter((m) => m.team2Type === "third");
 
-  // Assign each third-place team to a valid slot
+  // Try to find a valid assignment using backtracking
+  const assignment: Record<string, string | null> = {};
   const usedThirds = new Set<string>();
 
-  for (const slot of thirdSlots) {
-    // Find the best available third that can go in this slot
+  function backtrack(slotIndex: number): boolean {
+    if (slotIndex === thirdSlots.length) {
+      return true; // Successfully assigned all slots
+    }
+
+    const slot = thirdSlots[slotIndex];
+
+    // Try each third-place team in order (best to worst)
     for (const third of thirdPlaces) {
       if (
         !usedThirds.has(third.teamId) &&
         slot.team2PossibleThirdGroups?.includes(third.group)
       ) {
+        // Try assigning this third to this slot
         assignment[slot.id] = third.teamId;
         usedThirds.add(third.teamId);
-        break;
+
+        // Recursively try to assign remaining slots
+        if (backtrack(slotIndex + 1)) {
+          return true;
+        }
+
+        // Backtrack if assignment didn't work
+        assignment[slot.id] = null;
+        usedThirds.delete(third.teamId);
+      }
+    }
+
+    return false; // No valid assignment found
+  }
+
+  // Initialize all slots
+  thirdSlots.forEach((slot) => {
+    assignment[slot.id] = null;
+  });
+
+  // Run backtracking algorithm
+  backtrack(0);
+
+  return assignment;
+}
+
+// Get combination index (which of 495 combinations is this)
+export function getCombinationIndex(thirdPlaces: any[]): number {
+  // The 8 third-place teams are selected from 12 groups
+  // This creates C(12,8) = 495 possible combinations
+  // We identify the combination by which groups are included
+
+  const allGroups = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"];
+  const selectedGroups = thirdPlaces.map((t) => t.group).sort();
+  const excludedGroups = allGroups.filter((g) => !selectedGroups.includes(g));
+
+  // Calculate which combination number this is
+  // by counting all combinations that come before it lexicographically
+  let combinationNumber = 1;
+
+  for (let i = 0; i < 12; i++) {
+    const group = allGroups[i];
+    if (excludedGroups.includes(group)) {
+      // Count combinations where this group and later groups are excluded
+      const remainingPositions = 8 - (i - (12 - excludedGroups.length - i));
+      if (remainingPositions >= 0) {
+        combinationNumber += binomial(12 - i - 1, remainingPositions);
       }
     }
   }
 
-  return assignment;
+  return combinationNumber;
+}
+
+// Helper function to calculate binomial coefficient
+function binomial(n: number, k: number): number {
+  if (k > n) return 0;
+  if (k === 0 || k === n) return 1;
+
+  let result = 1;
+  for (let i = 0; i < k; i++) {
+    result *= (n - i) / (i + 1);
+  }
+  return Math.round(result);
 }
 
 // Initialize all knockout matches for Round of 32

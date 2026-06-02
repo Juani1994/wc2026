@@ -9,6 +9,7 @@ import {
   initializeRound32Matches,
   determineWinner,
   progressKnockout,
+  getCombinationIndex,
 } from "../utils/knockoutLogic";
 
 const STORAGE_KEY = "wc2026_state";
@@ -17,6 +18,8 @@ const KNOCKOUT_STORAGE_KEY = "wc2026_knockout";
 interface State {
   matches: Record<string, Match>;
   knockoutMatches: Record<string, KnockoutMatch>;
+  bestThirdPlaces: any[];
+  combinationIndex: number;
   updateMatch: (id: string, homeGoals: number, awayGoals: number) => void;
   updateKnockoutMatch: (
     id: string,
@@ -93,6 +96,8 @@ const useStore = create<State>((set) => {
   return {
     matches: loadFromStorage(),
     knockoutMatches: loadKnockoutFromStorage(),
+    bestThirdPlaces: [],
+    combinationIndex: 0,
 
     updateMatch: (id: string, homeGoals: number, awayGoals: number) => {
       set((state) => {
@@ -206,6 +211,7 @@ const useStore = create<State>((set) => {
     initializeKnockout: () => {
       set((state) => {
         const thirdPlaces = getBestThirdPlaces(state.matches);
+        const combinationIndex = getCombinationIndex(thirdPlaces);
         const thirdAssignment = assignThirdsToRound32(thirdPlaces);
         const knockoutMatches = initializeRound32Matches(
           state.matches,
@@ -213,7 +219,11 @@ const useStore = create<State>((set) => {
         );
 
         localStorage.setItem(KNOCKOUT_STORAGE_KEY, JSON.stringify(knockoutMatches));
-        return { knockoutMatches };
+        return {
+          knockoutMatches,
+          bestThirdPlaces: thirdPlaces,
+          combinationIndex
+        };
       });
     },
   };
