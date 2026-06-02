@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Match } from "../types";
 import { TEAMS } from "../data/teams";
 import Flag from "./Flag";
@@ -19,6 +19,11 @@ export default function MatchRow({ match }: MatchRowProps) {
 
   const homeTeam = TEAMS[match.homeTeam];
   const awayTeam = TEAMS[match.awayTeam];
+
+  useEffect(() => {
+    setHomeGoals(match.homeGoals !== null ? String(match.homeGoals) : "");
+    setAwayGoals(match.awayGoals !== null ? String(match.awayGoals) : "");
+  }, [match.homeGoals, match.awayGoals]);
 
   const handleSave = () => {
     const h = homeGoals === "" ? null : parseInt(homeGoals);

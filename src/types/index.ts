@@ -3,6 +3,7 @@ export interface Team {
   name: string;
   group: string;
   seed: 1 | 2 | 3 | 4; // position in group (determines fixtures)
+  fifaRanking: number; // FIFA world ranking (1-48 in this tournament)
 }
 
 export type MatchStatus = "pending" | "played";

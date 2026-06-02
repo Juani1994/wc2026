@@ -3,12 +3,15 @@ import type { GroupId } from "../data/groups";
 import GroupNav from "../components/GroupNav";
 import GroupCard from "../components/GroupCard";
 import BestThirds from "../components/BestThirds";
+import ShareModal from "../components/ShareModal";
 import useStore from "../store/useStore";
 
 type ViewMode = GroupId | "THIRDS";
 
 export default function GroupStage() {
   const [activeView, setActiveView] = useState<ViewMode>("A");
+  const [showShareModal, setShowShareModal] = useState(false);
+  const matches = useStore((s) => s.matches);
   const resetAll = useStore((s) => s.resetAll);
 
   const handleResetAll = () => {
@@ -28,12 +31,20 @@ export default function GroupStage() {
                 🏆 FIFA World Cup 2026
               </h1>
             </div>
-            <button
-              onClick={handleResetAll}
-              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold transition-colors shadow-lg hover:shadow-red-600/50"
-            >
-              Reset All
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setShowShareModal(true)}
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-colors shadow-lg hover:shadow-blue-600/50"
+              >
+                📤 Compartir
+              </button>
+              <button
+                onClick={handleResetAll}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold transition-colors shadow-lg hover:shadow-red-600/50"
+              >
+                Reset All
+              </button>
+            </div>
           </div>
           <GroupNav activeView={activeView} onSelectView={setActiveView} />
         </div>
@@ -47,6 +58,13 @@ export default function GroupStage() {
           <GroupCard groupId={activeView} />
         )}
       </main>
+
+      {/* Share Modal */}
+      <ShareModal
+        matches={matches}
+        isOpen={showShareModal}
+        onClose={() => setShowShareModal(false)}
+      />
     </div>
   );
 }

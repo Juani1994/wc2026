@@ -11,6 +11,7 @@ interface GroupCardProps {
 export default function GroupCard({ groupId }: GroupCardProps) {
   const allMatches = useStore((s) => s.matches);
   const resetGroup = useStore((s) => s.resetGroup);
+  const randomizeGroup = useStore((s) => s.randomizeGroup);
 
   const standings = calculateStandings(groupId, allMatches);
   const groupMatches = Object.values(allMatches).filter(
@@ -29,6 +30,10 @@ export default function GroupCard({ groupId }: GroupCardProps) {
     }
   };
 
+  const handleRandomize = () => {
+    randomizeGroup(groupId);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -36,12 +41,20 @@ export default function GroupCard({ groupId }: GroupCardProps) {
         <h2 className="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-blue-600">
           Group {groupId}
         </h2>
-        <button
-          onClick={handleResetGroup}
-          className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold transition-colors shadow-lg"
-        >
-          Reset Group
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={handleRandomize}
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition-colors shadow-lg"
+          >
+            🎲 Random Results
+          </button>
+          <button
+            onClick={handleResetGroup}
+            className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm font-semibold transition-colors shadow-lg"
+          >
+            Reset Group
+          </button>
+        </div>
       </div>
 
       {/* Standings and Matches Side by Side */}
