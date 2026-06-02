@@ -3,10 +3,11 @@ import type { GroupId } from "../data/groups";
 import GroupNav from "../components/GroupNav";
 import GroupCard from "../components/GroupCard";
 import BestThirds from "../components/BestThirds";
+import KnockoutStage from "./KnockoutStage";
 import ShareModal from "../components/ShareModal";
 import useStore from "../store/useStore";
 
-type ViewMode = GroupId | "THIRDS";
+type ViewMode = GroupId | "THIRDS" | "KNOCKOUT";
 
 export default function GroupStage() {
   const [activeView, setActiveView] = useState<ViewMode>("A");
@@ -54,6 +55,8 @@ export default function GroupStage() {
       <main className="max-w-7xl mx-auto px-6 py-10 space-y-12">
         {activeView === "THIRDS" ? (
           <BestThirds />
+        ) : activeView === "KNOCKOUT" ? (
+          <KnockoutStage />
         ) : (
           <GroupCard groupId={activeView} />
         )}

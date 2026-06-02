@@ -1,7 +1,7 @@
 import { GROUP_IDS } from "../data/groups";
 import type { GroupId } from "../data/groups";
 
-type ViewMode = GroupId | "THIRDS";
+type ViewMode = GroupId | "THIRDS" | "KNOCKOUT";
 
 interface GroupNavProps {
   activeView: ViewMode;
@@ -33,6 +33,16 @@ export default function GroupNav({ activeView, onSelectView }: GroupNavProps) {
         }`}
       >
         🏅 Terceros
+      </button>
+      <button
+        onClick={() => onSelectView("KNOCKOUT")}
+        className={`px-3 h-10 rounded-lg font-bold transition-all text-sm flex items-center justify-center shrink-0 ${
+          activeView === "KNOCKOUT"
+            ? "bg-gradient-to-r from-red-600 to-red-500 text-white shadow-lg shadow-red-500/50"
+            : "bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white"
+        }`}
+      >
+        🏆 Bracket
       </button>
     </div>
   );

@@ -8,6 +8,7 @@ import {
   assignThirdsToRound32,
   initializeRound32Matches,
   determineWinner,
+  progressKnockout,
 } from "../utils/knockoutLogic";
 
 const STORAGE_KEY = "wc2026_state";
@@ -75,9 +76,23 @@ const useStore = create<State>((set) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(matches));
   };
 
+  const loadKnockoutFromStorage = (): Record<string, KnockoutMatch> => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem(KNOCKOUT_STORAGE_KEY);
+      if (stored) {
+        try {
+          return JSON.parse(stored);
+        } catch (e) {
+          console.error("Failed to load knockout from localStorage:", e);
+        }
+      }
+    }
+    return {};
+  };
+
   return {
     matches: loadFromStorage(),
-    knockoutMatches: {},
+    knockoutMatches: loadKnockoutFromStorage(),
 
     updateMatch: (id: string, homeGoals: number, awayGoals: number) => {
       set((state) => {
@@ -167,7 +182,7 @@ const useStore = create<State>((set) => {
           awayPenalties: awayPenalties || match.awayPenalties,
         });
 
-        const updatedKnockout = {
+        let updatedKnockout = {
           ...state.knockoutMatches,
           [id]: {
             ...match,
@@ -179,6 +194,9 @@ const useStore = create<State>((set) => {
             status: "played" as const,
           },
         };
+
+        // Check if we need to progress to next round
+        updatedKnockout = progressKnockout(updatedKnockout);
 
         localStorage.setItem(KNOCKOUT_STORAGE_KEY, JSON.stringify(updatedKnockout));
         return { knockoutMatches: updatedKnockout };
