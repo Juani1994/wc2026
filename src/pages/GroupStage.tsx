@@ -18,7 +18,7 @@ export default function GroupStage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+    <div className="min-h-screen pb-16 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
       {/* Header */}
       <header className="bg-slate-900/90 backdrop-blur border-b-2 border-blue-900 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 py-4">
