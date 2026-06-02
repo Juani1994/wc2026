@@ -1,6 +1,6 @@
 import type { Match, KnockoutMatch } from "../types";
 import type { GroupId } from "../data/groups";
-import { ROUND_32_STRUCTURE } from "../data/knockout";
+import { findCombination } from "../data/round32Combinations";
 import { calculateStandings } from "./standings";
 import { TEAMS } from "../data/teams";
 
@@ -23,7 +23,6 @@ export function getBestThirdPlaces(matches: Record<string, Match>) {
     [] as (any)[]
   );
 
-  // Sort by points, goal diff, goals for (same logic as calculateStandings)
   return thirdPlaces
     .sort((a, b) => {
       if (b.points !== a.points) return b.points - a.points;
@@ -33,102 +32,10 @@ export function getBestThirdPlaces(matches: Record<string, Match>) {
     .slice(0, 8);
 }
 
-// Assign third-place teams to Round of 32 slots using backtracking
-export function assignThirdsToRound32(
-  thirdPlaces: any[]
-): Record<string, string | null> {
-  const thirdSlots = ROUND_32_STRUCTURE.filter((m) => m.team2Type === "third");
-
-  // Try to find a valid assignment using backtracking
-  const assignment: Record<string, string | null> = {};
-  const usedThirds = new Set<string>();
-
-  function backtrack(slotIndex: number): boolean {
-    if (slotIndex === thirdSlots.length) {
-      return true; // Successfully assigned all slots
-    }
-
-    const slot = thirdSlots[slotIndex];
-
-    // Try each third-place team in order (best to worst)
-    for (const third of thirdPlaces) {
-      if (
-        !usedThirds.has(third.teamId) &&
-        slot.team2PossibleThirdGroups?.includes(third.group)
-      ) {
-        // Try assigning this third to this slot
-        assignment[slot.id] = third.teamId;
-        usedThirds.add(third.teamId);
-
-        // Recursively try to assign remaining slots
-        if (backtrack(slotIndex + 1)) {
-          return true;
-        }
-
-        // Backtrack if assignment didn't work
-        assignment[slot.id] = null;
-        usedThirds.delete(third.teamId);
-      }
-    }
-
-    return false; // No valid assignment found
-  }
-
-  // Initialize all slots
-  thirdSlots.forEach((slot) => {
-    assignment[slot.id] = null;
-  });
-
-  // Run backtracking algorithm
-  backtrack(0);
-
-  return assignment;
-}
-
-// Get combination index (which of 495 combinations is this)
-export function getCombinationIndex(thirdPlaces: any[]): number {
-  // The 8 third-place teams are selected from 12 groups
-  // This creates C(12,8) = 495 possible combinations
-  // We identify the combination by which groups are included
-
-  const allGroups = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L"];
-  const selectedGroups = thirdPlaces.map((t) => t.group).sort();
-  const excludedGroups = allGroups.filter((g) => !selectedGroups.includes(g));
-
-  // Calculate which combination number this is
-  // by counting all combinations that come before it lexicographically
-  let combinationNumber = 1;
-
-  for (let i = 0; i < 12; i++) {
-    const group = allGroups[i];
-    if (excludedGroups.includes(group)) {
-      // Count combinations where this group and later groups are excluded
-      const remainingPositions = 8 - (i - (12 - excludedGroups.length - i));
-      if (remainingPositions >= 0) {
-        combinationNumber += binomial(12 - i - 1, remainingPositions);
-      }
-    }
-  }
-
-  return combinationNumber;
-}
-
-// Helper function to calculate binomial coefficient
-function binomial(n: number, k: number): number {
-  if (k > n) return 0;
-  if (k === 0 || k === n) return 1;
-
-  let result = 1;
-  for (let i = 0; i < k; i++) {
-    result *= (n - i) / (i + 1);
-  }
-  return Math.round(result);
-}
-
 // Initialize all knockout matches for Round of 32
 export function initializeRound32Matches(
   matches: Record<string, Match>,
-  thirdAssignment: Record<string, string | null>
+  thirdPlaces: any[]
 ): Record<string, KnockoutMatch> {
   const knockoutMatches: Record<string, KnockoutMatch> = {};
 
@@ -147,31 +54,32 @@ export function initializeRound32Matches(
     }
   });
 
-  // Create matches from ROUND_32_STRUCTURE
-  ROUND_32_STRUCTURE.forEach((matchRule) => {
-    let homeTeamId: string | null = null;
-    let awayTeamId: string | null = null;
+  // Find the valid combination for these third-place teams
+  const thirdGroups = thirdPlaces.map((t) => t.group);
+  const combination = findCombination(thirdGroups);
 
-    // Assign team 1
-    if (matchRule.team1Type === "winner") {
-      homeTeamId = groupStandings[matchRule.team1Group]?.[0]?.teamId || null;
-    } else if (matchRule.team1Type === "runner-up") {
-      homeTeamId = groupStandings[matchRule.team1Group]?.[1]?.teamId || null;
-    }
+  if (!combination) {
+    console.warn("No valid R32 combination found for thirds:", thirdGroups);
+    return {};
+  }
 
-    // Assign team 2
-    if (matchRule.team2Type === "winner") {
-      awayTeamId = groupStandings[matchRule.team2Group!]?.[0]?.teamId || null;
-    } else if (matchRule.team2Type === "runner-up") {
-      awayTeamId = groupStandings[matchRule.team2Group!]?.[1]?.teamId || null;
-    } else if (matchRule.team2Type === "third") {
-      awayTeamId = thirdAssignment[matchRule.id] || null;
-    }
+  // Create a map of third-place groups to teams
+  const thirdTeamsByGroup: Record<string, string> = {};
+  thirdPlaces.forEach((t) => {
+    thirdTeamsByGroup[t.group] = t.teamId;
+  });
 
-    knockoutMatches[matchRule.id] = {
-      id: matchRule.id,
+  let matchNumber = 1;
+
+  // First 8 matches: Winners vs Thirds (from combination)
+  for (const matchup of combination.matchups) {
+    const homeTeamId = groupStandings[matchup.firstGroup as GroupId]?.[0]?.teamId || null;
+    const awayTeamId = thirdTeamsByGroup[matchup.thirdGroup] || null;
+
+    knockoutMatches[`R32_${matchNumber}`] = {
+      id: `R32_${matchNumber}`,
       stage: "R32",
-      matchNumber: matchRule.matchNumber,
+      matchNumber,
       homeTeamId,
       awayTeamId,
       homeGoals: null,
@@ -181,7 +89,46 @@ export function initializeRound32Matches(
       winner: null,
       status: "pending",
     };
-  });
+
+    matchNumber++;
+  }
+
+  // Next 8 matches: Between other groups (non-third-opponent winners vs runners-up)
+  // These are fixed based on FIFA rules regardless of which thirds advance
+  const otherMatches = [
+    { home: ["A", 1], away: ["B", 1] },     // Match 9
+    { home: ["C", 0], away: ["F", 1] },     // Match 10
+    { home: ["E", 1], away: ["I", 1] },     // Match 11
+    { home: ["H", 0], away: ["J", 1] },     // Match 12
+    { home: ["D", 1], away: ["G", 1] },     // Match 13
+    { home: ["K", 0], away: ["L", 1] },     // Match 14
+    { home: ["F", 0], away: ["C", 1] },     // Match 15
+    { home: ["J", 0], away: ["H", 1] },     // Match 16
+  ];
+
+  for (const match of otherMatches) {
+    const [homeGroup, homeType] = match.home;
+    const [awayGroup, awayType] = match.away;
+
+    const homeTeamId = groupStandings[homeGroup as GroupId]?.[homeType]?.teamId || null;
+    const awayTeamId = groupStandings[awayGroup as GroupId]?.[awayType]?.teamId || null;
+
+    knockoutMatches[`R32_${matchNumber}`] = {
+      id: `R32_${matchNumber}`,
+      stage: "R32",
+      matchNumber,
+      homeTeamId,
+      awayTeamId,
+      homeGoals: null,
+      awayGoals: null,
+      homePenalties: null,
+      awayPenalties: null,
+      winner: null,
+      status: "pending",
+    };
+
+    matchNumber++;
+  }
 
   return knockoutMatches;
 }
@@ -206,7 +153,6 @@ export function determineWinner(
         ? match.homeTeamId
         : match.awayTeamId;
     }
-    // If no penalties yet, it's still pending
     return null;
   }
 }

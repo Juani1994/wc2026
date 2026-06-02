@@ -5,12 +5,11 @@ import { generateMatchResult } from "../utils/randomMatch";
 import { decodeStateFromUrl } from "../utils/shareState";
 import {
   getBestThirdPlaces,
-  assignThirdsToRound32,
   initializeRound32Matches,
   determineWinner,
   progressKnockout,
-  getCombinationIndex,
 } from "../utils/knockoutLogic";
+import { getCombinationIndex } from "../data/round32Combinations";
 
 const STORAGE_KEY = "wc2026_state";
 const KNOCKOUT_STORAGE_KEY = "wc2026_knockout";
@@ -211,11 +210,11 @@ const useStore = create<State>((set) => {
     initializeKnockout: () => {
       set((state) => {
         const thirdPlaces = getBestThirdPlaces(state.matches);
-        const combinationIndex = getCombinationIndex(thirdPlaces);
-        const thirdAssignment = assignThirdsToRound32(thirdPlaces);
+        const thirdGroups = thirdPlaces.map((t) => t.group);
+        const combinationIndex = getCombinationIndex(thirdGroups);
         const knockoutMatches = initializeRound32Matches(
           state.matches,
-          thirdAssignment
+          thirdPlaces
         );
 
         localStorage.setItem(KNOCKOUT_STORAGE_KEY, JSON.stringify(knockoutMatches));
