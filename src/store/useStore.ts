@@ -1,17 +1,33 @@
 import { create } from "zustand";
-import type { Match } from "../types";
+import type { Match, KnockoutMatch } from "../types";
 import { generateAllMatches } from "../data/groups";
 import { generateMatchResult } from "../utils/randomMatch";
 import { decodeStateFromUrl } from "../utils/shareState";
+import {
+  getBestThirdPlaces,
+  assignThirdsToRound32,
+  initializeRound32Matches,
+  determineWinner,
+} from "../utils/knockoutLogic";
 
 const STORAGE_KEY = "wc2026_state";
+const KNOCKOUT_STORAGE_KEY = "wc2026_knockout";
 
 interface State {
   matches: Record<string, Match>;
+  knockoutMatches: Record<string, KnockoutMatch>;
   updateMatch: (id: string, homeGoals: number, awayGoals: number) => void;
+  updateKnockoutMatch: (
+    id: string,
+    homeGoals: number,
+    awayGoals: number,
+    homePenalties?: number,
+    awayPenalties?: number
+  ) => void;
   resetGroup: (group: string) => void;
   resetAll: () => void;
   randomizeGroup: (group: string) => void;
+  initializeKnockout: () => void;
 }
 
 const initialMatches = generateAllMatches();
@@ -61,6 +77,7 @@ const useStore = create<State>((set) => {
 
   return {
     matches: loadFromStorage(),
+    knockoutMatches: {},
 
     updateMatch: (id: string, homeGoals: number, awayGoals: number) => {
       set((state) => {
@@ -128,6 +145,57 @@ const useStore = create<State>((set) => {
 
         saveToStorage(updatedMatches);
         return { matches: updatedMatches };
+      });
+    },
+
+    updateKnockoutMatch: (
+      id: string,
+      homeGoals: number,
+      awayGoals: number,
+      homePenalties?: number,
+      awayPenalties?: number
+    ) => {
+      set((state) => {
+        const match = state.knockoutMatches[id];
+        if (!match) return state;
+
+        const winner = determineWinner({
+          ...match,
+          homeGoals,
+          awayGoals,
+          homePenalties: homePenalties || match.homePenalties,
+          awayPenalties: awayPenalties || match.awayPenalties,
+        });
+
+        const updatedKnockout = {
+          ...state.knockoutMatches,
+          [id]: {
+            ...match,
+            homeGoals,
+            awayGoals,
+            homePenalties,
+            awayPenalties,
+            winner,
+            status: "played" as const,
+          },
+        };
+
+        localStorage.setItem(KNOCKOUT_STORAGE_KEY, JSON.stringify(updatedKnockout));
+        return { knockoutMatches: updatedKnockout };
+      });
+    },
+
+    initializeKnockout: () => {
+      set((state) => {
+        const thirdPlaces = getBestThirdPlaces(state.matches);
+        const thirdAssignment = assignThirdsToRound32(thirdPlaces);
+        const knockoutMatches = initializeRound32Matches(
+          state.matches,
+          thirdAssignment
+        );
+
+        localStorage.setItem(KNOCKOUT_STORAGE_KEY, JSON.stringify(knockoutMatches));
+        return { knockoutMatches };
       });
     },
   };
