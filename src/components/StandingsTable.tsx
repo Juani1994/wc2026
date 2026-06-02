@@ -8,38 +8,38 @@ interface StandingsTableProps {
 
 export default function StandingsTable({ standings }: StandingsTableProps) {
   return (
-    <div className="bg-slate-900 rounded-xl overflow-hidden shadow-2xl border border-slate-700">
-      <table className="w-full text-sm">
+    <div className="bg-slate-900 rounded-xl overflow-auto shadow-2xl border border-slate-700">
+      <table className="w-full text-sm md:text-base">
         <thead>
           <tr className="bg-gradient-to-r from-blue-900 to-blue-800 border-b-2 border-blue-600">
-            <th className="px-4 py-3 text-left text-xs font-bold text-blue-100 uppercase tracking-wider">
+            <th className="px-1 md:px-4 py-2 md:py-3 text-left text-xs font-bold text-blue-100 uppercase tracking-wider">
               #
             </th>
-            <th className="px-4 py-3 text-left text-xs font-bold text-blue-100 uppercase tracking-wider">
+            <th className="px-2 md:px-4 py-2 md:py-3 text-left text-xs font-bold text-blue-100 uppercase tracking-wider">
               Team
             </th>
-            <th className="px-2 py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
+            <th className="px-1 md:px-2 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
               P
             </th>
-            <th className="px-2 py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
+            <th className="px-1 md:px-2 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
               W
             </th>
-            <th className="px-2 py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
+            <th className="px-1 md:px-2 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
               D
             </th>
-            <th className="px-2 py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
+            <th className="px-1 md:px-2 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
               L
             </th>
-            <th className="px-2 py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
+            <th className="px-1 md:px-2 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
               GF
             </th>
-            <th className="px-2 py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
+            <th className="px-1 md:px-2 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
               GA
             </th>
-            <th className="px-2 py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
+            <th className="px-1 md:px-2 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
               GD
             </th>
-            <th className="px-4 py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
+            <th className="px-1 md:px-4 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
               Pts
             </th>
           </tr>
@@ -63,37 +63,37 @@ export default function StandingsTable({ standings }: StandingsTableProps) {
                 key={row.teamId}
                 className={`border-b ${borderColor} hover:bg-slate-700/40 transition-colors ${bgColor}`}
               >
-                <td className="px-4 py-3 text-center font-bold text-white">
+                <td className="px-1 md:px-4 py-2 md:py-3 text-center font-bold text-white text-xs md:text-base">
                   {idx + 1}
                 </td>
-                <td className="px-4 py-3 flex items-center gap-3">
-                  <Flag teamId={row.teamId} size="md" />
-                  <span className="text-white font-semibold truncate">
+                <td className="px-2 md:px-4 py-2 md:py-3 flex items-center gap-2 md:gap-3">
+                  <Flag teamId={row.teamId} size="sm" />
+                  <span className="text-white font-semibold truncate text-xs md:text-base">
                     {team?.name}
                   </span>
                 </td>
-                <td className="px-2 py-3 text-center font-semibold text-gray-200">
+                <td className="px-1 md:px-2 py-2 md:py-3 text-center font-semibold text-gray-200 text-xs md:text-base">
                   {row.played}
                 </td>
-                <td className="px-2 py-3 text-center font-semibold text-gray-200">
+                <td className="px-1 md:px-2 py-2 md:py-3 text-center font-semibold text-gray-200 text-xs md:text-base">
                   {row.won}
                 </td>
-                <td className="px-2 py-3 text-center font-semibold text-gray-200">
+                <td className="px-1 md:px-2 py-2 md:py-3 text-center font-semibold text-gray-200 text-xs md:text-base">
                   {row.drawn}
                 </td>
-                <td className="px-2 py-3 text-center font-semibold text-gray-200">
+                <td className="px-1 md:px-2 py-2 md:py-3 text-center font-semibold text-gray-200 text-xs md:text-base">
                   {row.lost}
                 </td>
-                <td className="px-2 py-3 text-center font-semibold text-gray-200">
+                <td className="px-1 md:px-2 py-2 md:py-3 text-center font-semibold text-gray-200 text-xs md:text-base">
                   {row.goalsFor}
                 </td>
-                <td className="px-2 py-3 text-center font-semibold text-gray-200">
+                <td className="px-1 md:px-2 py-2 md:py-3 text-center font-semibold text-gray-200 text-xs md:text-base">
                   {row.goalsAgainst}
                 </td>
-                <td className="px-2 py-3 text-center font-semibold text-gray-200">
+                <td className="px-1 md:px-2 py-2 md:py-3 text-center font-semibold text-gray-200 text-xs md:text-base">
                   {row.goalDiff > 0 ? "+" : ""}{row.goalDiff}
                 </td>
-                <td className="px-4 py-3 text-center font-bold text-yellow-300 text-base">
+                <td className="px-1 md:px-4 py-2 md:py-3 text-center font-bold text-yellow-300 text-xs md:text-base">
                   {row.points}
                 </td>
               </tr>

@@ -63,16 +63,14 @@ export default function Flag({ teamId, size = "md" }: FlagProps) {
   if (!team) return null;
 
   const sizeClasses = {
-    sm: "w-5 h-4",
-    md: "w-6 h-5",
-    lg: "w-8 h-6",
+    sm: "w-6 h-5",
+    md: "w-8 h-6",
+    lg: "w-10 h-8",
   };
 
   const flagCode = ISO3To2[teamId] || teamId.toLowerCase();
 
   return (
-    <div className={`${sizeClasses[size]} rounded-sm overflow-hidden`}>
-      <span className={`fi fi-${flagCode} block w-full h-full`}></span>
-    </div>
+    <span className={`${sizeClasses[size]} fi fi-${flagCode} rounded-sm inline-block`}></span>
   );
 }

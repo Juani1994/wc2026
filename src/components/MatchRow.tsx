@@ -39,22 +39,25 @@ export default function MatchRow({ match }: MatchRowProps) {
 
   return (
     <div
-      className={`flex items-center justify-between gap-3 px-4 py-3 rounded-lg transition-all border ${
+      className={`flex items-center justify-between gap-2 md:gap-3 px-2 md:px-4 py-2 md:py-3 rounded-lg transition-all border ${
         isPlayed
           ? "bg-emerald-900/20 border-emerald-700/40"
           : "bg-slate-800/50 border-slate-700"
       }`}
     >
       {/* Home Team */}
-      <div className="flex items-center gap-3 flex-1 min-w-0">
-        <Flag teamId={match.homeTeam} size="md" />
-        <span className="text-white font-semibold truncate text-sm">
+      <div className="flex items-center gap-2 flex-1 min-w-0">
+        <Flag teamId={match.homeTeam} size="sm" />
+        <span className="md:hidden text-white font-semibold text-xs">
+          {match.homeTeam}
+        </span>
+        <span className="hidden md:block text-white font-semibold truncate text-sm">
           {homeTeam?.name}
         </span>
       </div>
 
       {/* Score Inputs */}
-      <div className="flex items-center gap-3 shrink-0">
+      <div className="flex items-center gap-2 md:gap-3 shrink-0">
         <input
           type="number"
           min="0"
@@ -63,10 +66,10 @@ export default function MatchRow({ match }: MatchRowProps) {
           onChange={(e) => setHomeGoals(e.target.value)}
           onBlur={handleSave}
           onKeyDown={handleKeyDown}
-          className="w-12 h-12 text-center bg-slate-700 text-white rounded-lg font-bold text-lg border-2 border-slate-600 focus:border-blue-500 focus:outline-none hover:bg-slate-600 transition-colors"
+          className="w-9 h-9 md:w-12 md:h-12 text-center bg-slate-700 text-white rounded-lg font-bold text-sm md:text-lg border-2 border-slate-600 focus:border-blue-500 focus:outline-none hover:bg-slate-600 transition-colors"
           placeholder="—"
         />
-        <span className="text-gray-400 font-bold text-lg">—</span>
+        <span className="text-gray-400 font-bold text-sm md:text-lg">—</span>
         <input
           type="number"
           min="0"
@@ -75,17 +78,20 @@ export default function MatchRow({ match }: MatchRowProps) {
           onChange={(e) => setAwayGoals(e.target.value)}
           onBlur={handleSave}
           onKeyDown={handleKeyDown}
-          className="w-12 h-12 text-center bg-slate-700 text-white rounded-lg font-bold text-lg border-2 border-slate-600 focus:border-blue-500 focus:outline-none hover:bg-slate-600 transition-colors"
+          className="w-9 h-9 md:w-12 md:h-12 text-center bg-slate-700 text-white rounded-lg font-bold text-sm md:text-lg border-2 border-slate-600 focus:border-blue-500 focus:outline-none hover:bg-slate-600 transition-colors"
           placeholder="—"
         />
       </div>
 
       {/* Away Team */}
-      <div className="flex items-center gap-3 flex-1 min-w-0 justify-end">
-        <span className="text-white font-semibold truncate text-sm">
+      <div className="flex items-center gap-2 flex-1 min-w-0 justify-end">
+        <span className="md:hidden text-white font-semibold text-xs">
+          {match.awayTeam}
+        </span>
+        <span className="hidden md:block text-white font-semibold truncate text-sm">
           {awayTeam?.name}
         </span>
-        <Flag teamId={match.awayTeam} size="md" />
+        <Flag teamId={match.awayTeam} size="sm" />
       </div>
     </div>
   );
