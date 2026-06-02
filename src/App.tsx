@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/react'
 import GroupStage from './pages/GroupStage'
 import Footer from './components/Footer'
 
@@ -6,6 +7,7 @@ function App() {
     <>
       <GroupStage />
       <Footer />
+      <Analytics />
     </>
   )
 }
