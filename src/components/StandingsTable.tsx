@@ -1,0 +1,106 @@
+import type { StandingRow } from "../types";
+import { TEAMS } from "../data/teams";
+import Flag from "./Flag";
+
+interface StandingsTableProps {
+  standings: StandingRow[];
+}
+
+export default function StandingsTable({ standings }: StandingsTableProps) {
+  return (
+    <div className="bg-slate-900 rounded-xl overflow-hidden shadow-2xl border border-slate-700">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="bg-gradient-to-r from-blue-900 to-blue-800 border-b-2 border-blue-600">
+            <th className="px-4 py-3 text-left text-xs font-bold text-blue-100 uppercase tracking-wider">
+              #
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-bold text-blue-100 uppercase tracking-wider">
+              Team
+            </th>
+            <th className="px-2 py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
+              P
+            </th>
+            <th className="px-2 py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
+              W
+            </th>
+            <th className="px-2 py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
+              D
+            </th>
+            <th className="px-2 py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
+              L
+            </th>
+            <th className="px-2 py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
+              GF
+            </th>
+            <th className="px-2 py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
+              GA
+            </th>
+            <th className="px-2 py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
+              GD
+            </th>
+            <th className="px-4 py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
+              Pts
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {standings.map((row, idx) => {
+            const team = TEAMS[row.teamId];
+            let bgColor = "bg-slate-800";
+            let borderColor = "border-slate-700";
+
+            if (idx === 0 || idx === 1) {
+              bgColor = "bg-emerald-900/30";
+              borderColor = "border-emerald-700";
+            } else if (idx === 2) {
+              bgColor = "bg-amber-900/30";
+              borderColor = "border-amber-700";
+            }
+
+            return (
+              <tr
+                key={row.teamId}
+                className={`border-b ${borderColor} hover:bg-slate-700/40 transition-colors ${bgColor}`}
+              >
+                <td className="px-4 py-3 text-center font-bold text-white">
+                  {idx + 1}
+                </td>
+                <td className="px-4 py-3 flex items-center gap-3">
+                  <Flag teamId={row.teamId} size="md" />
+                  <span className="text-white font-semibold truncate">
+                    {team?.name}
+                  </span>
+                </td>
+                <td className="px-2 py-3 text-center font-semibold text-gray-200">
+                  {row.played}
+                </td>
+                <td className="px-2 py-3 text-center font-semibold text-gray-200">
+                  {row.won}
+                </td>
+                <td className="px-2 py-3 text-center font-semibold text-gray-200">
+                  {row.drawn}
+                </td>
+                <td className="px-2 py-3 text-center font-semibold text-gray-200">
+                  {row.lost}
+                </td>
+                <td className="px-2 py-3 text-center font-semibold text-gray-200">
+                  {row.goalsFor}
+                </td>
+                <td className="px-2 py-3 text-center font-semibold text-gray-200">
+                  {row.goalsAgainst}
+                </td>
+                <td className="px-2 py-3 text-center font-semibold text-gray-200">
+                  {row.goalDiff > 0 ? "+" : ""}{row.goalDiff}
+                </td>
+                <td className="px-4 py-3 text-center font-bold text-yellow-300 text-base">
+                  {row.points}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}

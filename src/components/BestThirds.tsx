@@ -1,0 +1,77 @@
+import { getThirdPlaces } from "../utils/thirds";
+import { TEAMS } from "../data/teams";
+import Flag from "./Flag";
+import useStore from "../store/useStore";
+
+export default function BestThirds() {
+  const matches = useStore((s) => s.matches);
+  const thirds = getThirdPlaces(matches);
+
+  return (
+    <div className="bg-slate-900 rounded-xl overflow-hidden shadow-2xl border border-slate-700">
+      <div className="px-6 py-4 bg-gradient-to-r from-blue-900 to-blue-800 border-b-2 border-blue-600">
+        <h3 className="text-lg font-bold text-blue-100 uppercase tracking-wider">
+          🏆 Best Third Places (Top 8 Advance)
+        </h3>
+      </div>
+
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="bg-slate-800 border-b border-slate-700">
+            <th className="px-4 py-3 text-left text-xs font-bold text-blue-100 uppercase tracking-wider">
+              #
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-bold text-blue-100 uppercase tracking-wider">
+              Team
+            </th>
+            <th className="px-4 py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
+              Grp
+            </th>
+            <th className="px-2 py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
+              P
+            </th>
+            <th className="px-2 py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
+              GF
+            </th>
+            <th className="px-2 py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
+              GA
+            </th>
+            <th className="px-2 py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
+              GD
+            </th>
+            <th className="px-4 py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
+              Pts
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {thirds.map((row, idx) => {
+            const team = TEAMS[row.teamId];
+            const qualifies = idx < 8;
+            const bgColor = qualifies ? "bg-emerald-900/30 border-emerald-700" : "bg-slate-800 border-slate-700";
+
+            return (
+              <tr key={row.teamId} className={`border-b ${bgColor} hover:bg-slate-700/40 transition-colors`}>
+                <td className={`px-4 py-3 text-center font-bold ${qualifies ? "text-emerald-300" : "text-white"}`}>
+                  {idx + 1}
+                </td>
+                <td className="px-4 py-3 flex items-center gap-3">
+                  <Flag teamId={row.teamId} size="md" />
+                  <span className="text-white font-semibold">{team?.name}</span>
+                </td>
+                <td className="px-4 py-3 text-center font-bold text-gray-200">{row.groupId}</td>
+                <td className="px-2 py-3 text-center font-semibold text-gray-200">{row.played}</td>
+                <td className="px-2 py-3 text-center font-semibold text-gray-200">{row.goalsFor}</td>
+                <td className="px-2 py-3 text-center font-semibold text-gray-200">{row.goalsAgainst}</td>
+                <td className="px-2 py-3 text-center font-semibold text-gray-200">
+                  {row.goalDiff > 0 ? "+" : ""}{row.goalDiff}
+                </td>
+                <td className="px-4 py-3 text-center font-bold text-yellow-300 text-base">{row.points}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
