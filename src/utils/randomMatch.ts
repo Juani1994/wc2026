@@ -57,7 +57,6 @@ export function generateMatchResult(
     }
   } else {
     // Away team wins
-    const awayWinProb = 1 - winProbability;
     const winMargin = Math.random();
     if (winMargin < 0.45) {
       // 0-1 win
