@@ -1,5 +1,6 @@
 import type { StandingRow } from "../types";
 import { TEAMS } from "../data/teams";
+import { useLanguage } from "../i18n/LanguageContext";
 import Flag from "./Flag";
 
 interface StandingsTableProps {
@@ -7,6 +8,7 @@ interface StandingsTableProps {
 }
 
 export default function StandingsTable({ standings }: StandingsTableProps) {
+  const { t } = useLanguage();
   return (
     <div className="bg-slate-900 rounded-xl overflow-auto shadow-2xl border border-slate-700">
       <table className="w-full text-sm md:text-base">
@@ -16,31 +18,31 @@ export default function StandingsTable({ standings }: StandingsTableProps) {
               #
             </th>
             <th className="px-2 md:px-4 py-2 md:py-3 text-left text-xs font-bold text-blue-100 uppercase tracking-wider">
-              Team
+              {t("table.team")}
             </th>
             <th className="px-1 md:px-2 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
-              P
+              {t("table.p")}
             </th>
             <th className="px-1 md:px-2 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
-              W
+              {t("table.w")}
             </th>
             <th className="px-1 md:px-2 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
-              D
+              {t("table.d")}
             </th>
             <th className="px-1 md:px-2 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
-              L
+              {t("table.l")}
             </th>
             <th className="px-1 md:px-2 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
-              GF
+              {t("table.gf")}
             </th>
             <th className="px-1 md:px-2 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
-              GA
+              {t("table.ga")}
             </th>
             <th className="px-1 md:px-2 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
-              GD
+              {t("table.gd")}
             </th>
             <th className="px-1 md:px-4 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
-              Pts
+              {t("table.pts")}
             </th>
           </tr>
         </thead>

@@ -13,6 +13,22 @@ export const translations: Record<Language, Record<string, string>> = {
 
     // Group Stage
     'groupStage.resetConfirm': 'Reset all results for all groups? This cannot be undone.',
+    'group.title': 'Group',
+    'group.standings': 'Standings',
+    'group.fixtures': 'Fixtures',
+    'group.matchday': 'Matchday',
+    'group.randomResults': 'Random Results',
+    'group.resetGroup': 'Reset Group',
+    'group.resetConfirm': 'Reset all results for Group',
+    'table.team': 'Team',
+    'table.p': 'P',
+    'table.w': 'W',
+    'table.d': 'D',
+    'table.l': 'L',
+    'table.gf': 'GF',
+    'table.ga': 'GA',
+    'table.gd': 'GD',
+    'table.pts': 'Pts',
 
     // Knockout Stage
     'knockout.combinationTitle': 'Combination of the 8 best third-place teams:',
@@ -31,6 +47,13 @@ export const translations: Record<Language, Record<string, string>> = {
     // Best Thirds
     'thirds.combination': 'Combination of 495:',
     'thirds.table': '#|Team|Grp|P|GF|GA|GD|Pts',
+    'thirds.team': 'Team',
+    'thirds.grp': 'Grp',
+    'thirds.pj': 'P',
+    'thirds.gf': 'GF',
+    'thirds.gc': 'GA',
+    'thirds.dg': 'GD',
+    'thirds.pts': 'Pts',
     'thirds.match': 'match',
     'thirds.matches': 'matches',
 
@@ -64,6 +87,22 @@ export const translations: Record<Language, Record<string, string>> = {
 
     // Group Stage
     'groupStage.resetConfirm': '¿Resetear todos los resultados de todos los grupos? Esto no se puede deshacer.',
+    'group.title': 'Grupo',
+    'group.standings': 'Clasificación',
+    'group.fixtures': 'Partidos',
+    'group.matchday': 'Fecha',
+    'group.randomResults': 'Resultados Aleatorios',
+    'group.resetGroup': 'Reset Grupo',
+    'group.resetConfirm': '¿Resetear todos los resultados del Grupo',
+    'table.team': 'Equipo',
+    'table.p': 'PJ',
+    'table.w': 'G',
+    'table.d': 'E',
+    'table.l': 'P',
+    'table.gf': 'GF',
+    'table.ga': 'GC',
+    'table.gd': 'DG',
+    'table.pts': 'Pts',
 
     // Knockout Stage
     'knockout.combinationTitle': 'Combinación de los 8 mejores terceros:',
@@ -82,6 +121,13 @@ export const translations: Record<Language, Record<string, string>> = {
     // Best Thirds
     'thirds.combination': 'Combinación de 495:',
     'thirds.table': '#|Equipo|Grp|PJ|GF|GC|DG|Pts',
+    'thirds.team': 'Equipo',
+    'thirds.grp': 'Grp',
+    'thirds.pj': 'PJ',
+    'thirds.gf': 'GF',
+    'thirds.gc': 'GC',
+    'thirds.dg': 'DG',
+    'thirds.pts': 'Pts',
     'thirds.match': 'partido',
     'thirds.matches': 'partidos',
 

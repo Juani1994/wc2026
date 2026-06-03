@@ -29,25 +29,25 @@ export default function BestThirds() {
                 #
               </th>
               <th className="px-2 md:px-4 py-2 md:py-3 text-left text-xs font-bold text-blue-100 uppercase tracking-wider">
-                {t("nav.thirdPlace").replace("🏅 ", "")}
+                {t("thirds.team")}
               </th>
               <th className="px-1 md:px-4 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
-                Grp
+                {t("thirds.grp")}
               </th>
               <th className="px-1 md:px-2 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
-                PJ
+                {t("thirds.pj")}
               </th>
               <th className="px-1 md:px-2 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
-                GF
+                {t("thirds.gf")}
               </th>
               <th className="px-1 md:px-2 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
-                GC
+                {t("thirds.gc")}
               </th>
               <th className="px-1 md:px-2 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
-                DG
+                {t("thirds.dg")}
               </th>
               <th className="px-1 md:px-4 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
-                Pts
+                {t("thirds.pts")}
               </th>
             </tr>
           </thead>
