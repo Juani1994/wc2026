@@ -62,10 +62,6 @@ export function generateMatchResult(
     baseHomeWin *
     (1 - drawProbability);
 
-  const awayWinProbability =
-    (1 - baseHomeWin) *
-    (1 - drawProbability);
-
   const random =
     Math.random();
 
