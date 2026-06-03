@@ -1,5 +1,6 @@
 import { getThirdPlaces } from "../utils/thirds";
 import { TEAMS } from "../data/teams";
+import { useLanguage } from "../i18n/LanguageContext";
 import Flag from "./Flag";
 import useStore from "../store/useStore";
 
@@ -7,13 +8,14 @@ export default function BestThirds() {
   const matches = useStore((s) => s.matches);
   const combinationIndex = useStore((s) => s.combinationIndex);
   const thirds = getThirdPlaces(matches);
+  const { t } = useLanguage();
 
   return (
     <div className="space-y-4">
-      {combinationIndex > 0 && (
+      {combinationIndex != null && combinationIndex > 0 && (
         <div className="bg-slate-800/50 rounded-lg border border-slate-700 p-4">
           <p className="text-sm text-gray-300">
-            <span className="text-gray-400">Combinación de 495: </span>
+            <span className="text-gray-400">{t("thirds.combination")} </span>
             <span className="font-bold text-blue-300">#{combinationIndex}</span>
           </p>
         </div>
@@ -27,22 +29,22 @@ export default function BestThirds() {
                 #
               </th>
               <th className="px-2 md:px-4 py-2 md:py-3 text-left text-xs font-bold text-blue-100 uppercase tracking-wider">
-                Team
+                {t("nav.thirdPlace").replace("🏅 ", "")}
               </th>
               <th className="px-1 md:px-4 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
                 Grp
               </th>
               <th className="px-1 md:px-2 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
-                P
+                PJ
               </th>
               <th className="px-1 md:px-2 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
                 GF
               </th>
               <th className="px-1 md:px-2 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
-                GA
+                GC
               </th>
               <th className="px-1 md:px-2 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
-                GD
+                DG
               </th>
               <th className="px-1 md:px-4 py-2 md:py-3 text-center text-xs font-bold text-blue-100 uppercase tracking-wider">
                 Pts

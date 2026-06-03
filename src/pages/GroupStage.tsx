@@ -1,5 +1,7 @@
 import { useState } from "react";
 import type { GroupId } from "../data/groups";
+import { useLanguage } from "../i18n/LanguageContext";
+import LanguageToggle from "../components/LanguageToggle";
 import GroupNav from "../components/GroupNav";
 import GroupCard from "../components/GroupCard";
 import BestThirds from "../components/BestThirds";
@@ -14,9 +16,10 @@ export default function GroupStage() {
   const [showShareModal, setShowShareModal] = useState(false);
   const matches = useStore((s) => s.matches);
   const resetAll = useStore((s) => s.resetAll);
+  const { t } = useLanguage();
 
   const handleResetAll = () => {
-    if (confirm("Reset all results for all groups? This cannot be undone.")) {
+    if (confirm(t("groupStage.resetConfirm"))) {
       resetAll();
     }
   };
@@ -29,21 +32,22 @@ export default function GroupStage() {
           <div className="flex items-center justify-between mb-3">
             <div>
               <h1 className="text-3xl font-black bg-gradient-to-r from-blue-400 to-blue-600 bg-clip-text text-transparent">
-                🏆 FIFA World Cup 2026
+                {t("header.title")}
               </h1>
             </div>
-            <div className="flex gap-2">
+            <div className="flex gap-2 items-center">
+              <LanguageToggle />
               <button
                 onClick={() => setShowShareModal(true)}
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-colors shadow-lg hover:shadow-blue-600/50"
               >
-                📤 Compartir
+                {t("header.share")}
               </button>
               <button
                 onClick={handleResetAll}
                 className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold transition-colors shadow-lg hover:shadow-red-600/50"
               >
-                Reset All
+                {t("header.resetAll")}
               </button>
             </div>
           </div>

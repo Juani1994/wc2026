@@ -1,5 +1,6 @@
 import { GROUP_IDS } from "../data/groups";
 import type { GroupId } from "../data/groups";
+import { useLanguage } from "../i18n/LanguageContext";
 
 type ViewMode = GroupId | "THIRDS" | "KNOCKOUT";
 
@@ -9,6 +10,8 @@ interface GroupNavProps {
 }
 
 export default function GroupNav({ activeView, onSelectView }: GroupNavProps) {
+  const { t } = useLanguage();
+
   return (
     <div className="bg-slate-800/50 rounded-lg p-2 flex gap-1.5 overflow-x-auto scrollbar-hide border border-slate-700">
       {GROUP_IDS.map((group) => (
@@ -32,7 +35,7 @@ export default function GroupNav({ activeView, onSelectView }: GroupNavProps) {
             : "bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white"
         }`}
       >
-        🏅 Terceros
+        {t("nav.thirdPlace")}
       </button>
       <button
         onClick={() => onSelectView("KNOCKOUT")}
@@ -42,7 +45,7 @@ export default function GroupNav({ activeView, onSelectView }: GroupNavProps) {
             : "bg-slate-700 text-slate-300 hover:bg-slate-600 hover:text-white"
         }`}
       >
-        🏆 Bracket
+        {t("nav.knockout")}
       </button>
     </div>
   );

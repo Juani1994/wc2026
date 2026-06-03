@@ -1,4 +1,5 @@
 import type { KnockoutMatch } from "../types";
+import { useLanguage } from "../i18n/LanguageContext";
 import KnockoutMatchComponent from "./KnockoutMatch";
 
 interface KnockoutRoundProps {
@@ -7,6 +8,8 @@ interface KnockoutRoundProps {
 }
 
 export default function KnockoutRound({ roundName, matches }: KnockoutRoundProps) {
+  const { t } = useLanguage();
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3 border-b border-slate-700 pb-3">
@@ -14,7 +17,7 @@ export default function KnockoutRound({ roundName, matches }: KnockoutRoundProps
           {roundName}
         </h3>
         <span className="text-gray-400 text-sm">
-          ({matches.length} {matches.length === 1 ? "partido" : "partidos"})
+          ({matches.length} {matches.length === 1 ? t("thirds.match") : t("thirds.matches")})
         </span>
       </div>
 

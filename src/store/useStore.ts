@@ -3,13 +3,8 @@ import type { Match, KnockoutMatch } from "../types";
 import { generateAllMatches } from "../data/groups";
 import { generateMatchResult } from "../utils/randomMatch";
 import { decodeStateFromUrl } from "../utils/shareState";
-import {
-  getBestThirdPlaces,
-  initializeRound32Matches,
-  determineWinner,
-  progressKnockout,
-} from "../utils/knockoutLogic";
-import { getCombinationIndex } from "../data/round32Combinations";
+import { determineWinner } from "../utils/knockoutLogic";
+import { buildFullKnockoutBracket, buildRoundOf32Bracket } from "../knockout";
 
 const STORAGE_KEY = "wc2026_state";
 const KNOCKOUT_STORAGE_KEY = "wc2026_knockout";
@@ -17,8 +12,9 @@ const KNOCKOUT_STORAGE_KEY = "wc2026_knockout";
 interface State {
   matches: Record<string, Match>;
   knockoutMatches: Record<string, KnockoutMatch>;
-  bestThirdPlaces: any[];
-  combinationIndex: number;
+  bestThirdPlaces: { groupId: string; teamId: string }[];
+  combinationIndex: number | null;
+  comboKey: string | null;
   updateMatch: (id: string, homeGoals: number, awayGoals: number) => void;
   updateKnockoutMatch: (
     id: string,
@@ -29,23 +25,21 @@ interface State {
   ) => void;
   resetGroup: (group: string) => void;
   resetAll: () => void;
+  resetKnockout: () => void;
   randomizeGroup: (group: string) => void;
   initializeKnockout: () => void;
 }
 
 const initialMatches = generateAllMatches();
 
-const useStore = create<State>((set) => {
-  // Load from URL or localStorage on initialization
+const useStore = create<State>((set, get) => {
   const loadFromStorage = (): Record<string, Match> => {
-    // Try to load from URL first
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const encodedState = params.get("predictions");
       if (encodedState) {
         const decoded = decodeStateFromUrl(encodedState);
         if (decoded && Object.keys(decoded).length > 0) {
-          // Merge decoded scores with initial matches structure
           const merged = { ...initialMatches };
           Object.entries(decoded).forEach(([id, data]) => {
             if (merged[id]) {
@@ -61,8 +55,6 @@ const useStore = create<State>((set) => {
         }
       }
     }
-
-    // Fall back to localStorage
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
       try {
@@ -92,138 +84,129 @@ const useStore = create<State>((set) => {
     return {};
   };
 
-  return {
-    matches: loadFromStorage(),
-    knockoutMatches: loadKnockoutFromStorage(),
-    bestThirdPlaces: [],
-    combinationIndex: 0,
+  const saveKnockoutToStorage = (k: Record<string, KnockoutMatch>) =>
+    localStorage.setItem(KNOCKOUT_STORAGE_KEY, JSON.stringify(k));
 
-    updateMatch: (id: string, homeGoals: number, awayGoals: number) => {
+  // Rebuild the knockout bracket from the current group state, preserving any
+  // user-entered scores where the pairing is unchanged.
+  const rebuildKnockout = (
+    matches: Record<string, Match>,
+    existing: Record<string, KnockoutMatch>
+  ) => {
+    const knockoutMatches = buildFullKnockoutBracket(matches, existing);
+    const { bestThirds, comboKey, comboIndex } = buildRoundOf32Bracket(matches);
+    return {
+      knockoutMatches,
+      bestThirdPlaces: bestThirds.map((t) => ({ groupId: t.groupId, teamId: t.teamId })),
+      comboKey,
+      combinationIndex: comboIndex,
+    };
+  };
+
+  const initialStoredKnockout = loadKnockoutFromStorage();
+  const initialLoaded = loadFromStorage();
+  const initial = rebuildKnockout(initialLoaded, initialStoredKnockout);
+  saveKnockoutToStorage(initial.knockoutMatches);
+
+  return {
+    matches: initialLoaded,
+    knockoutMatches: initial.knockoutMatches,
+    bestThirdPlaces: initial.bestThirdPlaces,
+    combinationIndex: initial.combinationIndex,
+    comboKey: initial.comboKey,
+
+    updateMatch: (id, homeGoals, awayGoals) => {
       set((state) => {
         const match = state.matches[id];
         if (!match) return state;
-
         const updatedMatches = {
           ...state.matches,
-          [id]: {
-            ...match,
-            homeGoals,
-            awayGoals,
-            status: "played" as const,
-          },
+          [id]: { ...match, homeGoals, awayGoals, status: "played" as const },
         };
-
         saveToStorage(updatedMatches);
-        return { matches: updatedMatches };
+        const rebuilt = rebuildKnockout(updatedMatches, state.knockoutMatches);
+        saveKnockoutToStorage(rebuilt.knockoutMatches);
+        return { matches: updatedMatches, ...rebuilt };
       });
     },
 
-    resetGroup: (group: string) => {
+    resetGroup: (group) => {
       set((state) => {
         const updatedMatches = { ...state.matches };
-        Object.entries(updatedMatches).forEach(([key, match]) => {
-          if (match.group === group) {
-            updatedMatches[key] = {
-              ...match,
-              homeGoals: null,
-              awayGoals: null,
-              status: "pending",
-            };
+        Object.entries(updatedMatches).forEach(([key, m]) => {
+          if (m.group === group) {
+            updatedMatches[key] = { ...m, homeGoals: null, awayGoals: null, status: "pending" };
           }
         });
-
         saveToStorage(updatedMatches);
-        return { matches: updatedMatches };
+        const rebuilt = rebuildKnockout(updatedMatches, state.knockoutMatches);
+        saveKnockoutToStorage(rebuilt.knockoutMatches);
+        return { matches: updatedMatches, ...rebuilt };
       });
     },
 
     resetAll: () => {
       set(() => {
         saveToStorage(initialMatches);
-        return { matches: initialMatches };
+        const rebuilt = rebuildKnockout(initialMatches, {});
+        saveKnockoutToStorage(rebuilt.knockoutMatches);
+        return { matches: initialMatches, ...rebuilt };
       });
     },
 
-    randomizeGroup: (group: string) => {
+    resetKnockout: () => {
+      set((state) => {
+        const rebuilt = rebuildKnockout(state.matches, {});
+        saveKnockoutToStorage(rebuilt.knockoutMatches);
+        return rebuilt;
+      });
+    },
+
+    randomizeGroup: (group) => {
       set((state) => {
         const updatedMatches = { ...state.matches };
-        Object.entries(updatedMatches).forEach(([key, match]) => {
-          if (match.group === group) {
-            const { homeGoals, awayGoals } = generateMatchResult(
-              match.homeTeam,
-              match.awayTeam
-            );
-            updatedMatches[key] = {
-              ...match,
-              homeGoals,
-              awayGoals,
-              status: "played" as const,
-            };
+        Object.entries(updatedMatches).forEach(([key, m]) => {
+          if (m.group === group) {
+            const { homeGoals, awayGoals } = generateMatchResult(m.homeTeam, m.awayTeam);
+            updatedMatches[key] = { ...m, homeGoals, awayGoals, status: "played" as const };
           }
         });
-
         saveToStorage(updatedMatches);
-        return { matches: updatedMatches };
+        const rebuilt = rebuildKnockout(updatedMatches, state.knockoutMatches);
+        saveKnockoutToStorage(rebuilt.knockoutMatches);
+        return { matches: updatedMatches, ...rebuilt };
       });
     },
 
-    updateKnockoutMatch: (
-      id: string,
-      homeGoals: number,
-      awayGoals: number,
-      homePenalties?: number,
-      awayPenalties?: number
-    ) => {
+    updateKnockoutMatch: (id, homeGoals, awayGoals, homePenalties, awayPenalties) => {
       set((state) => {
         const match = state.knockoutMatches[id];
         if (!match) return state;
-
-        const winner = determineWinner({
+        const updatedMatch: KnockoutMatch = {
           ...match,
           homeGoals,
           awayGoals,
-          homePenalties: homePenalties || match.homePenalties,
-          awayPenalties: awayPenalties || match.awayPenalties,
-        });
-
-        let updatedKnockout = {
-          ...state.knockoutMatches,
-          [id]: {
-            ...match,
-            homeGoals,
-            awayGoals,
-            homePenalties,
-            awayPenalties,
-            winner,
-            status: "played" as const,
-          },
+          homePenalties: homePenalties ?? null,
+          awayPenalties: awayPenalties ?? null,
+          status: "played" as const,
         };
+        const winner = determineWinner(updatedMatch);
+        const withWinner: KnockoutMatch = { ...updatedMatch, winner };
 
-        // Check if we need to progress to next round
-        updatedKnockout = progressKnockout(updatedKnockout);
-
-        localStorage.setItem(KNOCKOUT_STORAGE_KEY, JSON.stringify(updatedKnockout));
-        return { knockoutMatches: updatedKnockout };
+        // Splice this match in, then re-derive downstream rounds.
+        const intermediate = { ...state.knockoutMatches, [id]: withWinner };
+        const fullyBuilt = buildFullKnockoutBracket(state.matches, intermediate);
+        saveKnockoutToStorage(fullyBuilt);
+        return { knockoutMatches: fullyBuilt };
       });
     },
 
     initializeKnockout: () => {
-      set((state) => {
-        const thirdPlaces = getBestThirdPlaces(state.matches);
-        const thirdGroups = thirdPlaces.map((t) => t.group);
-        const combinationIndex = getCombinationIndex(thirdGroups);
-        const knockoutMatches = initializeRound32Matches(
-          state.matches,
-          thirdPlaces
-        );
-
-        localStorage.setItem(KNOCKOUT_STORAGE_KEY, JSON.stringify(knockoutMatches));
-        return {
-          knockoutMatches,
-          bestThirdPlaces: thirdPlaces,
-          combinationIndex
-        };
-      });
+      // Kept for API compatibility; no-op since the bracket is always derived.
+      const state = get();
+      const rebuilt = rebuildKnockout(state.matches, state.knockoutMatches);
+      saveKnockoutToStorage(rebuilt.knockoutMatches);
+      set(rebuilt);
     },
   };
 });

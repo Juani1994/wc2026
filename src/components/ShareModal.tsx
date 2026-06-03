@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Match } from "../types";
+import { useLanguage } from "../i18n/LanguageContext";
 import { encodeStateToUrl, getSharingUrls } from "../utils/shareState";
 
 interface ShareModalProps {
@@ -9,6 +10,7 @@ interface ShareModalProps {
 }
 
 export default function ShareModal({ matches, isOpen, onClose }: ShareModalProps) {
+  const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
 
   if (!isOpen) return null;
@@ -36,7 +38,7 @@ export default function ShareModal({ matches, isOpen, onClose }: ShareModalProps
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-white">🔗 Compartir Predicción</h2>
+          <h2 className="text-xl font-bold text-white">{t("share.title")}</h2>
           <button
             onClick={onClose}
             className="text-gray-400 hover:text-white transition-colors"
@@ -46,7 +48,7 @@ export default function ShareModal({ matches, isOpen, onClose }: ShareModalProps
         </div>
 
         <p className="text-gray-300 text-sm mb-6">
-          Comparte tus predicciones con amigos
+          {t("share.description")}
         </p>
 
         <div className="space-y-3 mb-6">
@@ -93,13 +95,12 @@ export default function ShareModal({ matches, isOpen, onClose }: ShareModalProps
             }`}
           >
             <span className="text-xl">{copied ? "✓" : "📋"}</span>
-            <span>{copied ? "¡Copiado!" : "Copiar Enlace"}</span>
+            <span>{copied ? t("share.copied") : t("share.copyLink")}</span>
           </button>
         </div>
 
         <p className="text-gray-400 text-xs">
-          El enlace contiene todas tus predicciones actuales y se cargará automáticamente
-          cuando alguien lo abra.
+          {t("share.linkNote")}
         </p>
       </div>
     </div>

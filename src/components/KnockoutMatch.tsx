@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { KnockoutMatch } from "../types";
 import { TEAMS } from "../data/teams";
+import { useLanguage } from "../i18n/LanguageContext";
 import Flag from "./Flag";
 import useStore from "../store/useStore";
 
@@ -10,6 +11,7 @@ interface KnockoutMatchProps {
 
 export default function KnockoutMatchComponent({ match }: KnockoutMatchProps) {
   const updateKnockoutMatch = useStore((s) => s.updateKnockoutMatch);
+  const { t } = useLanguage();
   const [homeGoals, setHomeGoals] = useState(
     match.homeGoals !== null ? String(match.homeGoals) : ""
   );
@@ -62,7 +64,7 @@ export default function KnockoutMatchComponent({ match }: KnockoutMatchProps) {
         </span>
         {match.winner && (
           <span className="text-xs font-bold text-emerald-400">
-            ✓ Ganador: {TEAMS[match.winner]?.name}
+            ✓ {t("match.winner")} {TEAMS[match.winner]?.name}
           </span>
         )}
       </div>
@@ -72,7 +74,7 @@ export default function KnockoutMatchComponent({ match }: KnockoutMatchProps) {
         <div className="flex items-center gap-2 flex-1 min-w-0">
           {homeTeam && <Flag teamId={match.homeTeamId!} size="sm" />}
           <span className="text-white font-semibold truncate text-sm">
-            {homeTeam?.name || "TBD"}
+            {homeTeam?.name || t("match.tbd")}
           </span>
         </div>
         <input
@@ -93,7 +95,7 @@ export default function KnockoutMatchComponent({ match }: KnockoutMatchProps) {
         <div className="flex items-center gap-2 flex-1 min-w-0">
           {awayTeam && <Flag teamId={match.awayTeamId!} size="sm" />}
           <span className="text-white font-semibold truncate text-sm">
-            {awayTeam?.name || "TBD"}
+            {awayTeam?.name || t("match.tbd")}
           </span>
         </div>
         <input
@@ -112,7 +114,7 @@ export default function KnockoutMatchComponent({ match }: KnockoutMatchProps) {
       {/* Penalties (if draw) */}
       {isDraw && (
         <div className="mt-2 pt-3 border-t border-slate-600 space-y-2">
-          <span className="text-xs text-gray-400">Penales</span>
+          <span className="text-xs text-gray-400">{t("match.penalties")}</span>
           <div className="flex gap-2 items-center justify-center">
             <input
               type="number"
