@@ -7,16 +7,23 @@ import useStore from "../store/useStore";
 export default function BestThirds() {
   const matches = useStore((s) => s.matches);
   const combinationIndex = useStore((s) => s.combinationIndex);
+  const comboKey = useStore((s) => s.comboKey);
   const thirds = getThirdPlaces(matches);
   const { t } = useLanguage();
 
   return (
     <div className="space-y-4">
-      {combinationIndex != null && combinationIndex > 0 && (
+      {combinationIndex != null && combinationIndex > 0 && comboKey && (
         <div className="bg-slate-800/50 rounded-lg border border-slate-700 p-4">
-          <p className="text-sm text-gray-300">
+          <p className="text-sm text-gray-300 mb-2">
             <span className="text-gray-400">{t("thirds.combination")} </span>
-            <span className="font-bold text-blue-300">#{combinationIndex}</span>
+            <span className="font-bold text-blue-300">#{combinationIndex} / 495</span>
+          </p>
+          <p className="text-sm text-gray-300">
+            <span className="text-gray-400">{t("knockout.groupsQualified")} </span>
+            <span className="font-mono font-bold text-emerald-300">
+              {comboKey.split("").join(" · ")}
+            </span>
           </p>
         </div>
       )}
