@@ -68,18 +68,18 @@ const R32_TEMPLATES: R32Template[] = [
   // R16_2
   { fifa: 73, home: fixed("2", "A"), away: fixed("2", "B") },
   { fifa: 75, home: fixed("1", "F"), away: fixed("2", "C") },
-  // R16_3
-  { fifa: 76, home: fixed("1", "C"), away: fixed("2", "F") },
-  { fifa: 78, home: fixed("2", "E"), away: fixed("2", "I") },
-  // R16_4
-  { fifa: 79, home: fixed("1", "A"), away: thirdOf("1A") },
-  { fifa: 80, home: fixed("1", "L"), away: thirdOf("1L") },
   // R16_5
   { fifa: 83, home: fixed("2", "K"), away: fixed("2", "L") },
   { fifa: 84, home: fixed("1", "H"), away: fixed("2", "J") },
   // R16_6
   { fifa: 81, home: fixed("1", "D"), away: thirdOf("1D") },
   { fifa: 82, home: fixed("1", "G"), away: thirdOf("1G") },
+  // R16_3
+  { fifa: 76, home: fixed("1", "C"), away: fixed("2", "F") },
+  { fifa: 78, home: fixed("2", "E"), away: fixed("2", "I") },
+  // R16_4
+  { fifa: 79, home: fixed("1", "A"), away: thirdOf("1A") },
+  { fifa: 80, home: fixed("1", "L"), away: thirdOf("1L") },
   // R16_7
   { fifa: 86, home: fixed("1", "J"), away: fixed("2", "H") },
   { fifa: 88, home: fixed("2", "D"), away: fixed("2", "G") },
