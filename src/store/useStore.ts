@@ -124,7 +124,8 @@ const useStore = create<State>((set, get) => {
           [id]: { ...match, homeGoals, awayGoals, status: "played" as const },
         };
         saveToStorage(updatedMatches);
-        const rebuilt = rebuildKnockout(updatedMatches, state.knockoutMatches);
+        const hasKnockoutMatches = Object.keys(state.knockoutMatches).length > 0;
+        const rebuilt = rebuildKnockout(updatedMatches, hasKnockoutMatches ? {} : state.knockoutMatches);
         saveKnockoutToStorage(rebuilt.knockoutMatches);
         return { matches: updatedMatches, ...rebuilt };
       });

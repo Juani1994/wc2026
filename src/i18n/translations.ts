@@ -45,7 +45,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'knockout.noMatches': 'Complete the groups to see the knockout bracket',
 
     // Best Thirds
-    'thirds.combination': 'Combination of 495:',
+    'thirds.combination': 'Group combinations for the 8 best third-placed teams:',
     'thirds.table': '#|Team|Grp|P|GF|GA|GD|Pts',
     'thirds.team': 'Team',
     'thirds.grp': 'Grp',
@@ -119,7 +119,7 @@ export const translations: Record<Language, Record<string, string>> = {
     'knockout.noMatches': 'Completa los grupos para ver el bracket de eliminatorias',
 
     // Best Thirds
-    'thirds.combination': 'Combinación de 495:',
+    'thirds.combination': 'Combinación de grupos de los 8 mejores terceros:',
     'thirds.table': '#|Equipo|Grp|PJ|GF|GC|DG|Pts',
     'thirds.team': 'Equipo',
     'thirds.grp': 'Grp',
