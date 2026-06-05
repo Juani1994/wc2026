@@ -5,6 +5,7 @@ import useStore from "../store/useStore";
 export default function KnockoutStage() {
   const knockoutMatches = useStore((s) => s.knockoutMatches);
   const resetKnockout = useStore((s) => s.resetKnockout);
+  const randomizeKnockoutRound = useStore((s) => s.randomizeKnockoutRound);
   const { t } = useLanguage();
 
   const r32Matches = Object.values(knockoutMatches).filter((m) => m.stage === "R32");
@@ -17,6 +18,7 @@ export default function KnockoutStage() {
   const hasAnyR32Teams = r32Matches.some(
     (m) => m.homeTeamId !== null || m.awayTeamId !== null
   );
+
 
   const handleReset = () => {
     if (confirm(t("knockout.resetKnockout"))) {
@@ -38,36 +40,68 @@ export default function KnockoutStage() {
                   ({r32Matches.length} {r32Matches.length === 1 ? t("thirds.match") : t("thirds.matches")})
                 </span>
               </div>
-              <button
-                onClick={handleReset}
-                className="px-3 py-2 bg-red-600/80 hover:bg-red-600 text-white rounded-md text-xs font-bold transition-colors"
-              >
-                {t("knockout.resetKnockout")}
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => randomizeKnockoutRound("R32")}
+                  className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-xs font-semibold transition-colors"
+                >
+                  🎲 {t("group.randomResults")}
+                </button>
+                <button
+                  onClick={handleReset}
+                  className="px-3 py-2 bg-red-600/80 hover:bg-red-600 text-white rounded-md text-xs font-bold transition-colors"
+                >
+                  {t("knockout.resetKnockout")}
+                </button>
+              </div>
             </div>
           )}
-          <KnockoutRound roundName={hasAnyR32Teams ? "" : t("knockout.round32")} matches={r32Matches} />
+          <KnockoutRound
+            roundName={hasAnyR32Teams ? "" : t("knockout.round32")}
+            matches={r32Matches}
+            onRandomize={() => randomizeKnockoutRound("R32")}
+          />
         </>
       )}
 
       {r16Matches.length > 0 && (
-        <KnockoutRound roundName={t("knockout.round16")} matches={r16Matches} />
+        <KnockoutRound
+          roundName={t("knockout.round16")}
+          matches={r16Matches}
+          onRandomize={() => randomizeKnockoutRound("R16")}
+        />
       )}
 
       {qfMatches.length > 0 && (
-        <KnockoutRound roundName={t("knockout.quarterfinals")} matches={qfMatches} />
+        <KnockoutRound
+          roundName={t("knockout.quarterfinals")}
+          matches={qfMatches}
+          onRandomize={() => randomizeKnockoutRound("QF")}
+        />
       )}
 
       {sfMatches.length > 0 && (
-        <KnockoutRound roundName={t("knockout.semifinals")} matches={sfMatches} />
+        <KnockoutRound
+          roundName={t("knockout.semifinals")}
+          matches={sfMatches}
+          onRandomize={() => randomizeKnockoutRound("SF")}
+        />
       )}
 
       {thirdPlaceMatch.length > 0 && (
-        <KnockoutRound roundName={t("knockout.thirdPlace")} matches={thirdPlaceMatch} />
+        <KnockoutRound
+          roundName={t("knockout.thirdPlace")}
+          matches={thirdPlaceMatch}
+          onRandomize={() => randomizeKnockoutRound("THIRD")}
+        />
       )}
 
       {finalMatch.length > 0 && (
-        <KnockoutRound roundName={t("knockout.final")} matches={finalMatch} />
+        <KnockoutRound
+          roundName={t("knockout.final")}
+          matches={finalMatch}
+          onRandomize={() => randomizeKnockoutRound("FINAL")}
+        />
       )}
 
       {r32Matches.length === 0 && !hasAnyR32Teams && (

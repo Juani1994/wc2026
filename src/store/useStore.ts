@@ -21,12 +21,15 @@ interface State {
     homeGoals: number,
     awayGoals: number,
     homePenalties?: number,
-    awayPenalties?: number
+    awayPenalties?: number,
+    forceWinnerId?: string
   ) => void;
   resetGroup: (group: string) => void;
   resetAll: () => void;
   resetKnockout: () => void;
   randomizeGroup: (group: string) => void;
+  randomizeKnockoutRound: (stage: "R32" | "R16" | "QF" | "SF" | "FINAL" | "THIRD") => void;
+  randomizeAllKnockout: () => void;
   initializeKnockout: () => void;
 }
 
@@ -179,7 +182,75 @@ const useStore = create<State>((set, get) => {
       });
     },
 
-    updateKnockoutMatch: (id, homeGoals, awayGoals, homePenalties, awayPenalties) => {
+    randomizeKnockoutRound: (stage) => {
+      set((state) => {
+        const updatedKnockout = { ...state.knockoutMatches };
+        Object.entries(updatedKnockout).forEach(([key, m]) => {
+          if (m.stage === stage && m.homeTeamId && m.awayTeamId) {
+            const { homeGoals, awayGoals } = generateMatchResult(m.homeTeamId, m.awayTeamId);
+            let homePenalties: number | null = null;
+            let awayPenalties: number | null = null;
+
+            const isDraw = homeGoals === awayGoals;
+            if (isDraw) {
+              const homeWinsShootout = Math.random() < 0.5;
+              homePenalties = homeWinsShootout ? Math.floor(Math.random() * 5) + 4 : Math.floor(Math.random() * 3) + 1;
+              awayPenalties = !homeWinsShootout ? Math.floor(Math.random() * 5) + 4 : Math.floor(Math.random() * 3) + 1;
+            }
+
+            const matchWithResult = {
+              ...m,
+              homeGoals,
+              awayGoals,
+              homePenalties,
+              awayPenalties,
+              status: "played" as const,
+            };
+            const winner = determineWinner(matchWithResult);
+            updatedKnockout[key] = { ...matchWithResult, winner };
+          }
+        });
+        const fullyBuilt = buildFullKnockoutBracket(state.matches, updatedKnockout);
+        saveKnockoutToStorage(fullyBuilt);
+        return { knockoutMatches: fullyBuilt };
+      });
+    },
+
+    randomizeAllKnockout: () => {
+      set((state) => {
+        const updatedKnockout = { ...state.knockoutMatches };
+        Object.entries(updatedKnockout).forEach(([key, m]) => {
+          if (m.homeTeamId && m.awayTeamId && m.status !== "played") {
+            const { homeGoals, awayGoals } = generateMatchResult(m.homeTeamId, m.awayTeamId);
+            let homePenalties: number | null = null;
+            let awayPenalties: number | null = null;
+
+            const isDraw = homeGoals === awayGoals;
+            if (isDraw) {
+              const homeWinsShootout = Math.random() < 0.5;
+              homePenalties = homeWinsShootout ? Math.floor(Math.random() * 5) + 4 : Math.floor(Math.random() * 3) + 1;
+              awayPenalties = !homeWinsShootout ? Math.floor(Math.random() * 5) + 4 : Math.floor(Math.random() * 3) + 1;
+            }
+
+            const matchWithResult = {
+              ...m,
+              homeGoals,
+              awayGoals,
+              homePenalties,
+              awayPenalties,
+              status: "played" as const,
+            };
+            const winner = determineWinner(matchWithResult);
+            updatedKnockout[key] = { ...matchWithResult, winner };
+          }
+        });
+        const fullyBuilt = buildFullKnockoutBracket(state.matches, updatedKnockout);
+        saveKnockoutToStorage(fullyBuilt);
+        return { knockoutMatches: fullyBuilt };
+      });
+    },
+
+    updateKnockoutMatch: (id, homeGoals, awayGoals, homePenalties, awayPenalties, forceWinnerId) => {
       set((state) => {
         const match = state.knockoutMatches[id];
         if (!match) return state;
@@ -191,10 +262,9 @@ const useStore = create<State>((set, get) => {
           awayPenalties: awayPenalties ?? null,
           status: "played" as const,
         };
-        const winner = determineWinner(updatedMatch);
+        const winner = forceWinnerId || determineWinner(updatedMatch);
         const withWinner: KnockoutMatch = { ...updatedMatch, winner };
 
-        // Splice this match in, then re-derive downstream rounds.
         const intermediate = { ...state.knockoutMatches, [id]: withWinner };
         const fullyBuilt = buildFullKnockoutBracket(state.matches, intermediate);
         saveKnockoutToStorage(fullyBuilt);

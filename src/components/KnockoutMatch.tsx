@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { KnockoutMatch } from "../types";
 import { TEAMS } from "../data/teams";
 import { useLanguage } from "../i18n/LanguageContext";
@@ -18,12 +18,11 @@ export default function KnockoutMatchComponent({ match }: KnockoutMatchProps) {
   const [awayGoals, setAwayGoals] = useState(
     match.awayGoals !== null ? String(match.awayGoals) : ""
   );
-  const [homePenalties, setHomePenalties] = useState(
-    match.homePenalties !== null ? String(match.homePenalties) : ""
-  );
-  const [awayPenalties, setAwayPenalties] = useState(
-    match.awayPenalties !== null ? String(match.awayPenalties) : ""
-  );
+
+  useEffect(() => {
+    setHomeGoals(match.homeGoals !== null ? String(match.homeGoals) : "");
+    setAwayGoals(match.awayGoals !== null ? String(match.awayGoals) : "");
+  }, [match.homeGoals, match.awayGoals]);
 
   const homeTeam = match.homeTeamId ? TEAMS[match.homeTeamId] : null;
   const awayTeam = match.awayTeamId ? TEAMS[match.awayTeamId] : null;
@@ -33,9 +32,13 @@ export default function KnockoutMatchComponent({ match }: KnockoutMatchProps) {
     const a = awayGoals === "" ? null : parseInt(awayGoals);
 
     if (h !== null && a !== null && h >= 0 && a >= 0) {
-      const hp = homePenalties === "" ? undefined : parseInt(homePenalties);
-      const ap = awayPenalties === "" ? undefined : parseInt(awayPenalties);
-      updateKnockoutMatch(match.id, h, a, hp, ap);
+      updateKnockoutMatch(match.id, h, a);
+    }
+  };
+
+  const handleChooseWinner = (winnerTeamId: string) => {
+    if (match.homeGoals !== null && match.awayGoals !== null) {
+      updateKnockoutMatch(match.id, match.homeGoals, match.awayGoals, undefined, undefined, winnerTeamId);
     }
   };
 
@@ -46,8 +49,7 @@ export default function KnockoutMatchComponent({ match }: KnockoutMatchProps) {
   };
 
   const isPlayed = match.homeGoals !== null && match.awayGoals !== null;
-  const isDraw =
-    isPlayed && match.homeGoals === match.awayGoals;
+  const isDraw = isPlayed && match.homeGoals === match.awayGoals;
 
   return (
     <div
@@ -114,31 +116,28 @@ export default function KnockoutMatchComponent({ match }: KnockoutMatchProps) {
       {/* Penalties (if draw) */}
       {isDraw && (
         <div className="mt-2 pt-3 border-t border-slate-600 space-y-2">
-          <span className="text-xs text-gray-400">{t("match.penalties")}</span>
-          <div className="flex gap-2 items-center justify-center">
-            <input
-              type="number"
-              min="0"
-              max="15"
-              value={homePenalties}
-              onChange={(e) => setHomePenalties(e.target.value)}
-              onBlur={handleSave}
-              onKeyDown={handleKeyDown}
-              placeholder="—"
-              className="w-12 h-10 text-center bg-slate-700 text-white rounded-lg font-bold border-2 border-yellow-600 focus:border-yellow-400"
-            />
-            <span className="text-gray-400">-</span>
-            <input
-              type="number"
-              min="0"
-              max="15"
-              value={awayPenalties}
-              onChange={(e) => setAwayPenalties(e.target.value)}
-              onBlur={handleSave}
-              onKeyDown={handleKeyDown}
-              placeholder="—"
-              className="w-12 h-10 text-center bg-slate-700 text-white rounded-lg font-bold border-2 border-yellow-600 focus:border-yellow-400"
-            />
+          <span className="text-xs text-gray-400 mb-2 block">{t("match.penalties")}</span>
+          <div className="flex gap-2">
+            <button
+              onClick={() => match.homeTeamId && handleChooseWinner(match.homeTeamId)}
+              className={`flex-1 py-2 px-3 rounded-lg font-semibold text-sm transition-colors ${
+                match.winner === match.homeTeamId
+                  ? "bg-emerald-600 text-white"
+                  : "bg-slate-700 text-gray-300 hover:bg-slate-600"
+              }`}
+            >
+              {homeTeam?.name || t("match.tbd")}
+            </button>
+            <button
+              onClick={() => match.awayTeamId && handleChooseWinner(match.awayTeamId)}
+              className={`flex-1 py-2 px-3 rounded-lg font-semibold text-sm transition-colors ${
+                match.winner === match.awayTeamId
+                  ? "bg-emerald-600 text-white"
+                  : "bg-slate-700 text-gray-300 hover:bg-slate-600"
+              }`}
+            >
+              {awayTeam?.name || t("match.tbd")}
+            </button>
           </div>
         </div>
       )}
