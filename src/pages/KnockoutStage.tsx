@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { useLanguage } from "../i18n/LanguageContext";
 import KnockoutRound from "../components/KnockoutRound";
+import BracketModal from "../components/BracketModal";
 import useStore from "../store/useStore";
 
 export default function KnockoutStage() {
+  const [showBracketModal, setShowBracketModal] = useState(false);
   const knockoutMatches = useStore((s) => s.knockoutMatches);
   const resetKnockout = useStore((s) => s.resetKnockout);
   const randomizeKnockoutRound = useStore((s) => s.randomizeKnockoutRound);
@@ -14,6 +17,11 @@ export default function KnockoutStage() {
   const sfMatches = Object.values(knockoutMatches).filter((m) => m.stage === "SF");
   const finalMatch = Object.values(knockoutMatches).filter((m) => m.stage === "FINAL");
   const thirdPlaceMatch = Object.values(knockoutMatches).filter((m) => m.stage === "THIRD");
+
+  const allMatches = Object.values(knockoutMatches);
+  const allMatchesCompleted = allMatches.every(
+    (m) => m.homeTeamId && m.awayTeamId && m.homeGoals !== null && m.awayGoals !== null && m.winner
+  );
 
   const hasAnyR32Teams = r32Matches.some(
     (m) => m.homeTeamId !== null || m.awayTeamId !== null
@@ -97,11 +105,24 @@ export default function KnockoutStage() {
       )}
 
       {finalMatch.length > 0 && (
-        <KnockoutRound
-          roundName={t("knockout.final")}
-          matches={finalMatch}
-          onRandomize={() => randomizeKnockoutRound("FINAL")}
-        />
+        <>
+          <KnockoutRound
+            roundName={t("knockout.final")}
+            matches={finalMatch}
+            onRandomize={() => randomizeKnockoutRound("FINAL")}
+          />
+
+          {allMatchesCompleted && (
+            <div className="flex justify-center mt-8">
+              <button
+                onClick={() => setShowBracketModal(true)}
+                className="px-6 py-3 bg-gradient-to-r from-yellow-600 to-yellow-500 hover:from-yellow-700 hover:to-yellow-600 text-white rounded-lg font-bold text-lg transition-all shadow-lg"
+              >
+                {t("knockout.showBracket")}
+              </button>
+            </div>
+          )}
+        </>
       )}
 
       {r32Matches.length === 0 && !hasAnyR32Teams && (
@@ -111,6 +132,12 @@ export default function KnockoutStage() {
           </p>
         </div>
       )}
+
+      <BracketModal
+        isOpen={showBracketModal}
+        onClose={() => setShowBracketModal(false)}
+        knockoutMatches={knockoutMatches}
+      />
     </div>
   );
 }

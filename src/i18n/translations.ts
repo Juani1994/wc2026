@@ -43,6 +43,9 @@ export const translations: Record<Language, Record<string, string>> = {
     'knockout.thirdPlace': '🥉 Third Place Match',
     'knockout.final': '🏆 Final',
     'knockout.noMatches': 'Complete the groups to see the knockout bracket',
+    'knockout.showBracket': '🏆 Show Final Bracket',
+    'knockout.bracketTitle': '🏆 FIFA World Cup 2026 - Final Bracket',
+    'knockout.bracketHint': 'Tip: scroll horizontally to see the full bracket.',
 
     // Best Thirds
     'thirds.combination': 'Group combinations for the 8 best third-placed teams:',
@@ -117,6 +120,9 @@ export const translations: Record<Language, Record<string, string>> = {
     'knockout.thirdPlace': '🥉 Tercer Puesto',
     'knockout.final': '🏆 Final',
     'knockout.noMatches': 'Completa los grupos para ver el bracket de eliminatorias',
+    'knockout.showBracket': '🏆 Ver Bracket Final',
+    'knockout.bracketTitle': '🏆 Copa Mundial FIFA 2026 - Bracket Final',
+    'knockout.bracketHint': 'Tip: desliza horizontalmente para ver el bracket completo.',
 
     // Best Thirds
     'thirds.combination': 'Combinación de grupos de los 8 mejores terceros:',
